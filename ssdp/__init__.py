@@ -1,15 +1,27 @@
-"""Python asyncio library for Simple Service Discovery Protocol (SSDP)."""
-import asyncio
-import email.parser
-import errno
-import logging
+"""Python library for Simple Service Discovery Protocol (SSDP)."""
 
-__all__ = ('SSDPRequest', 'SSDPResponse', 'SimpleServiceDiscoveryProtocol')
+import email.parser
+import logging
+import ipaddress
+
+
+__all__ = ('NetworkConstants', 'SSDPMessage', 'SSDPRequest', 'SSDPResponse')
+
 
 logger = logging.getLogger('ssdp')
 
 
-class SSDPMessage:
+class NetworkConstants(object):
+    MULTICAST_ADDRESS_IPV4 = ipaddress.IPv4Address('239.255.255.250')
+    MULTICAST_ADDRESS_IPV6_LINK_LOCAL = ipaddress.IPv6Address('ff02::c')
+    MULTICAST_ADDRESS_IPV6_SITE_LOCAL = ipaddress.IPv6Address('ff05::c')
+    MULTICAST_ADDRESS_IPV6_ORG_LOCAL = ipaddress.IPv6Address('ff08::c')
+    MULTICAST_ADDRESS_IPV6_GLOBAL = ipaddress.IPv6Address('ff0e::c')
+
+    PORT = 1900
+
+
+class SSDPMessage(object):
     """Simplified HTTP message to serve as a SSDP message."""
 
     def __init__(self, version='HTTP/1.1', headers=None):
@@ -33,7 +45,10 @@ class SSDPMessage:
             SSDPMessage: Message parsed from string.
 
         """
-        raise NotImplementedError()
+        if msg.startswith('HTTP/'):
+            return SSDPResponse.parse(msg)
+        else:
+            return SSDPRequest.parse(msg)
 
     @classmethod
     def parse_headers(cls, msg):
@@ -107,7 +122,7 @@ class SSDPRequest(SSDPMessage):
         Send request to a given address via given transport.
 
         Args:
-            transport (asyncio.DatagramTransport):
+            transport
                 Write transport to send the message on.
             addr (Tuple[str, int]):
                 IP address and port pair to send the message to.
@@ -127,55 +142,3 @@ class SSDPRequest(SSDPMessage):
             lines.append('%s: %s' % header)
         return '\n'.join(lines)
 
-
-class SimpleServiceDiscoveryProtocol(asyncio.DatagramProtocol):
-    """
-    Simple Service Discovery Protocol (SSDP).
-
-    SSDP is part of UPnP protocol stack. For more information see:
-    https://en.wikipedia.org/wiki/Simple_Service_Discovery_Protocol
-    """
-
-    MULTICAST_ADDRESS = '239.255.255.250'
-
-    def datagram_received(self, data, addr):
-        data = data.decode()
-        logger.debug("%s:%s > %s", *(addr + (data,)))
-
-        if data.startswith('HTTP/'):
-            self.response_received(SSDPResponse.parse(data), addr)
-        else:
-            self.request_received(SSDPRequest.parse(data), addr)
-
-    def response_received(self, response, addr):
-        """
-        Called when some response is received.
-
-        Args:
-            response (SSDPResponse): Received response.
-            addr (Tuple[str, int]: Tuple containing IP address and port number.
-
-        """
-        raise NotImplementedError()
-
-    def request_received(self, request, addr):
-        """
-        Called when some request is received.
-
-        Args:
-            request (SSDPRequest): Received request.
-            addr (Tuple[str, int]: Tuple containing IP address and port number.
-
-        """
-        raise NotImplementedError()
-
-    def error_received(self, exc):
-        if exc == errno.EAGAIN or exc == errno.EWOULDBLOCK:
-            logger.error('Error received: %s', exc)
-        else:
-            raise IOError("Unexpected connection error") from exc
-
-    def connection_lost(self, exc):
-        logger.exception("Socket closed, stop the event loop", exc_info=exc)
-        loop = asyncio.get_event_loop()
-        loop.stop()
