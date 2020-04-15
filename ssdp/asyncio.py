@@ -32,7 +32,7 @@ class SimpleServiceDiscoveryProtocol(asyncio.DatagramProtocol):
 
     def response_received(self, response, addr):
         """
-        Called when some response is received.
+        Call when some response is received.
 
         Args:
             response (SSDPResponse): Received response.
@@ -43,7 +43,7 @@ class SimpleServiceDiscoveryProtocol(asyncio.DatagramProtocol):
 
     def request_received(self, request, addr):
         """
-        Called when some request is received.
+        Call when some request is received.
 
         Args:
             request (SSDPRequest): Received request.
