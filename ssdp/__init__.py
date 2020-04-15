@@ -11,7 +11,7 @@ __all__ = ('NetworkConstants', 'SSDPMessage', 'SSDPRequest', 'SSDPResponse')
 logger = logging.getLogger('ssdp')
 
 
-class NetworkConstants(object):
+class NetworkConstants:
     MULTICAST_ADDRESS_IPV4 = ipaddress.IPv4Address('239.255.255.250')
     MULTICAST_ADDRESS_IPV6_LINK_LOCAL = ipaddress.IPv6Address('ff02::c')
     MULTICAST_ADDRESS_IPV6_SITE_LOCAL = ipaddress.IPv6Address('ff05::c')
@@ -21,7 +21,7 @@ class NetworkConstants(object):
     PORT = 1900
 
 
-class SSDPMessage(object):
+class SSDPMessage:
     """Simplified HTTP message to serve as a SSDP message."""
 
     def __init__(self, version='HTTP/1.1', headers=None):
