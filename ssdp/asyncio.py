@@ -36,7 +36,7 @@ class SimpleServiceDiscoveryProtocol(asyncio.DatagramProtocol):
 
         Args:
             response (SSDPResponse): Received response.
-            addr (Tuple[str, int]: Tuple containing IP address and port number.
+            addr (Tuple[str, int]): Tuple containing IP address and port number.
 
         """
         raise NotImplementedError()
@@ -47,7 +47,7 @@ class SimpleServiceDiscoveryProtocol(asyncio.DatagramProtocol):
 
         Args:
             request (SSDPRequest): Received request.
-            addr (Tuple[str, int]: Tuple containing IP address and port number.
+            addr (Tuple[str, int]): Tuple containing IP address and port number.
 
         """
         raise NotImplementedError()

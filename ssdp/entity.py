@@ -23,7 +23,7 @@ class SSDPMessage:
     @classmethod
     def parse(cls, msg):
         """
-        Parse message from string.
+        Parse message a string into a :class:`SSDPMessage` instance.
 
         Args:
             msg (str): Message string.
@@ -46,7 +46,7 @@ class SSDPMessage:
             msg (str): HTTP message.
 
         Returns:
-            (List[Tuple[str, str]): List of header tuples.
+            (List[Tuple[str, str]]): List of header tuples.
 
         """
         return list(email.parser.Parser().parsestr(msg).items())
