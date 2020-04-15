@@ -21,10 +21,10 @@ Usage
 .. code:: python
 
     import asyncio
-    import ssdp.asyncio
+    import ssdp
 
 
-    class MyProtocol(ssdp.asyncio.SimpleServiceDiscoveryProtocol):
+    class MyProtocol(ssdp.SimpleServiceDiscoveryProtocol):
 
         def response_received(self, response, addr):
             print(response, addr)
